@@ -15,62 +15,62 @@ set ThermalStCuCloudCase=1
 
 
 if ($MakeMieTables) then
-  # Runs cloudprp to make Mie table files for ppmieprp.
+  # Runs cloudprp to make Mie table files for ppmieprp.e.
      # Water cloud droplets at 0.86 um
-    set miefile=water_w0.86.mie
+    set miefile="../data/mie/water_w0.86_mie.dat"
     set wavelen=0.86
     set alpha=7
     set Nretab=15 ;  set Sretab=1 ;  set Eretab=15
     set maxNleg=2000
-    put O $miefile W "$wavelen $wavelen" G $alpha \
+    put.e O $miefile W "$wavelen $wavelen" G $alpha \
         "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
 
      # Water cloud droplets at 2.13 um
-    set miefile=water_w2.13.mie
+    set miefile="../data/mie/water_w2.13_mie.dat"
     set wavelen=2.13
     set alpha=7
     set Nretab=15 ;  set Sretab=1 ;  set Eretab=15
     set maxNleg=2000
-    put O $miefile W "$wavelen $wavelen" G $alpha \
+    put.e O $miefile W "$wavelen $wavelen" G $alpha \
         "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
 
      # Water cloud droplets at 10.7 um
-    set miefile=water_w10.7.mie
+    set miefile="../data/mie/water_w10.7_mie.dat"
     set wavelen=10.7
     set alpha=7
     set Nretab=15 ;  set Sretab=1 ;  set Eretab=15
     set maxNleg=2000
-    put O $miefile W "$wavelen $wavelen" G $alpha \
+    put.e O $miefile W "$wavelen $wavelen" G $alpha \
         "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
 
      # Sea salt aerosols at 0.86 um
-    set miefile=seasalt_w0.86.mie
+    set miefile="../data/mie/seasalt_w0.86_mie.dat"
     set wavelen=0.86
     set index="(1.28,-3.0e-6)"
     set alpha=0.70
     set Nretab=20 ;  set Sretab=0.05 ;  set Eretab=1.0
     set maxNleg=1000
-    put O $miefile A "$index" "$wavelen $wavelen" L $alpha \
+    put.e O $miefile A "$index" "$wavelen $wavelen" L $alpha \
         "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
 
      # Sea salt aerosols at 2.13 um
-    set miefile=seasalt_w2.13.mie
+    set miefile="../data/mie/seasalt_w2.13_mie.dat"
     set wavelen=2.13
     set index="(1.445,-0.0015)"
     set alpha=0.70
     set Nretab=20 ;  set Sretab=0.05 ;  set Eretab=1.0
     set maxNleg=1000
-    put O $miefile A "$index" "$wavelen $wavelen" L $alpha \
+    put.e O $miefile A "$index" "$wavelen $wavelen" L $alpha \
         "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
 
      # Dust aerosols
-    set miefile=dust_w0.55.mie
+    set miefile="../data/mie/dust_w0.55_mie.dat"
     set wavelen=0.55
     set index="(1.50,-0.002)"
     set alpha=0.70
     set Nretab=20 ;  set Sretab=0.1 ;  set Eretab=2.0
     set maxNleg=1000
-    put O $miefile A "$index" "$wavelen $wavelen" L $alpha \
+    put.e O $miefile A "$index" "$wavelen $wavelen" L $alpha \
         "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
 endif
 
@@ -88,9 +88,9 @@ if ($SolarAerosolCase) then
   set molabs = (0.020 0.009 0 0 0 0 0 0)
   set raylcoef=0.00332
 
-  put $Ncomp dust_w0.55.mie $Nlay "$heights" "$temps" \
+  put.e $Ncomp ../data/mie/dust_w0.55_mie.dat $Nlay "$heights" "$temps" \
        0 0  0 0  0 0   0.04 0.6  0.08 0.8  0.15 1.0  0.30 1.5 \
-      "$molabs"  $raylcoef $prpfile | ppmieprp  > /dev/null
+      "$molabs"  $raylcoef $prpfile | ppmieprp.e  > /dev/null
 
 
 
@@ -108,7 +108,7 @@ if ($SolarAerosolCase) then
   set fluxref=dust${wavelen}disref_flux.out
   set radref=dust${wavelen}disref_rad.out
   if (1) then
-    put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+    put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
         $fluxref $radref 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
       1 | /usr/bin/time disortsh${Nmu} >&! disreflog${wavelen}.t
   endif
@@ -124,7 +124,7 @@ if ($SolarAerosolCase) then
 
     set fluxfile=dust${wavelen}dis_flux.out
     set radfile=dust${wavelen}dis_rad.out
-    put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+    put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
       $fluxfile  $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
       $Ntimes | /usr/bin/time disortsh${Nmu} >&! disortlog.t
     set CPU=`tail -2 disortlog.t | awk '{if (NR==1) print $1+0;}'`
@@ -154,7 +154,7 @@ if ($SolarAerosolCase) then
 
         set fluxfile=dust${wavelen}shpp_flux.out
         set radfile=dust${wavelen}shpp_rad.out
-        put $prpfile NONE "$Nmu $Nphi"  S "$solarflux $solarmu" $skyrad \
+        put.e $prpfile NONE "$Nmu $Nphi"  S "$solarflux $solarmu" $skyrad \
            L $sfcalb $wavelen $splitacc $solacc "$accel $maxiter" \
            $fluxfile 1 $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
            $Ntimes | /usr/bin/time shdomppt >>& shdompplog.t
@@ -187,11 +187,11 @@ endif
 
 if ($SolarStCuCloudCase) then
 
-  # Make StCu cloud LWP and Reff profile: Linear LWC increase with height, 
+  # Make StCu cloud LWP and Reff profile: Linear LWC increase with height,
   #    constant number concentration (N)
   if (0) then
-    awk 'BEGIN {nl=6; dz=0.050; lwcmax=0.667; N=100; a=lwcmax/(nl*dz); 
-      for (i=1; i<=nl; i++) {z=i*dz; W=a*z; P=0.5*a*(z^2-(z-dz)^2);  
+    awk 'BEGIN {nl=6; dz=0.050; lwcmax=0.667; N=100; a=lwcmax/(nl*dz);
+      for (i=1; i<=nl; i++) {z=i*dz; W=a*z; P=0.5*a*(z^2-(z-dz)^2);
         re=100*(P/(dz*N*3))^0.333; tau=1500*P/re; printf "%5.2f %5.3f %6.2f %5.2f %5.2f\n",
            z,W,1000*P,re,tau; lwp+=1000*P; taut+=tau;}  print "LWP=",lwp,"   tau=",taut; }'
   endif
@@ -205,7 +205,7 @@ if ($SolarStCuCloudCase) then
   set molabs = (0 0 0 0 0 0 0 0)
   set raylcoef=0.00054
 
-  put $Ncomp water_w0.86.mie seasalt_w0.86.mie \
+  put.e $Ncomp ../data/mie/water_w0.86_mie.dat seasalt_w0.86_mie.dat \
       $Nlay "$heights" "$temps" \
       "0 0"    "0 0" \
       "30.57 0" "12.70 0" \
@@ -215,7 +215,7 @@ if ($SolarStCuCloudCase) then
        "8.34 0"  "8.24 0" \
        "2.78 0"  "5.72 0" \
        "0 0.02"  "0 0.5" \
-      "$molabs"  $raylcoef $prpfile | ppmieprp > /dev/null
+      "$molabs"  $raylcoef $prpfile | ppmieprp.e > /dev/null
 
   # Make the property file at 2.13 um
   #  Molecular absorption from MODTRAN3 for US std atmos
@@ -227,7 +227,7 @@ if ($SolarStCuCloudCase) then
   set molabs = (0.0173 0.0004 0.0004 0.0004 0.0004 0.0004 0.0004 0.0044)
   set raylcoef=0.0
 
-  put $Ncomp water_w2.13.mie seasalt_w2.13.mie \
+  put.e $Ncomp ../data/mie/water_w2.13_mie.dat ../data/mie/seasalt_w2.13_mie.dat \
       $Nlay "$heights" "$temps" \
       "0 0"    "0 0" \
       "30.57 0" "12.70 0" \
@@ -237,7 +237,7 @@ if ($SolarStCuCloudCase) then
        "8.34 0"  "8.24 0" \
        "2.78 0"  "5.72 0" \
        "0 0.02"  "0 0.5" \
-      "$molabs"  $raylcoef $prpfile | ppmieprp > /dev/null
+      "$molabs"  $raylcoef $prpfile | ppmieprp.e > /dev/null
 
 
   # Run the radiative transfer comparison
@@ -255,7 +255,7 @@ if ($SolarStCuCloudCase) then
     set fluxref=stcu${wavelen}disref_flux.out
     set radref=stcu${wavelen}disref_rad.out
     if (1) then
-     put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+     put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
         $fluxref $radref 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
       1 | /usr/bin/time disortsh${Nmu} >&! disreflog${wavelen}.t
     endif
@@ -271,7 +271,7 @@ if ($SolarStCuCloudCase) then
 
       set fluxfile=stcu${wavelen}dis_flux.out
       set radfile=stcu${wavelen}dis_rad.out
-      put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+      put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
         $fluxfile  $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
         $Ntimes | /usr/bin/time disortsh${Nmu} >&! disortlog.t
       set CPU=`tail -2 disortlog.t | awk '{if (NR==1) print $1+0;}'`
@@ -298,10 +298,10 @@ if ($SolarStCuCloudCase) then
         @ Nphi = 2 * $Nmu
         set accel=T ;  set maxiter=300
         @ Ntimes = 16384 / ( $Nmu * $Nmu )
- 
+
         set fluxfile=stcu${wavelen}shpp_flux.out
         set radfile=stcu${wavelen}shpp_rad.out
-        put $prpfile NONE "$Nmu $Nphi"  S "$solarflux $solarmu" $skyrad \
+        put.e $prpfile NONE "$Nmu $Nphi"  S "$solarflux $solarmu" $skyrad \
            L $sfcalb $wavelen $splitacc $solacc "$accel $maxiter" \
            $fluxfile 1 $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
            $Ntimes | /usr/bin/time shdomppt  >>& shdompplog.t
@@ -345,9 +345,9 @@ if ($SolarThickCloudCase) then
   set molabs = (0)
   set raylcoef=0.0
 
-  put $Ncomp water_w0.86.mie \
+  put.e $Ncomp ../data/mie/water_w0.86_mie.dat \
       $Nlay "$heights" "$temps"  600 10 \
-      "$molabs"  $raylcoef $prpfile | ppmieprp > /dev/null
+      "$molabs"  $raylcoef $prpfile | ppmieprp.e > /dev/null
 
   # Run the radiative transfer comparison
   set solarmu=0.5
@@ -363,7 +363,7 @@ if ($SolarThickCloudCase) then
   set fluxref=thick${wavelen}disref_flux.out
   set radref=thick${wavelen}disref_rad.out
   if (1) then
-     put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+     put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
         $fluxref $radref 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
       1 | /usr/bin/time disortsh${Nmu} >&! disreflog${wavelen}t.t
   endif
@@ -379,7 +379,7 @@ if ($SolarThickCloudCase) then
 
     set fluxfile=thick${wavelen}dis_flux.out
     set radfile=thick${wavelen}dis_rad.out
-    put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+    put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
         $fluxfile  $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
         $Ntimes | /usr/bin/time disortsh${Nmu} >&! disortlog.t
     set CPU=`tail -2 disortlog.t | awk '{if (NR==1) print $1+0;}'`
@@ -406,10 +406,10 @@ if ($SolarThickCloudCase) then
         @ Nphi = 2 * $Nmu
         set accel=T ;  set maxiter=300
         @ Ntimes = 4096 / ( $Nmu * $Nmu )
- 
+
         set fluxfile=thick${wavelen}shpp_flux.out
         set radfile=thick${wavelen}shpp_rad.out
-        put $prpfile NONE "$Nmu $Nphi"  S "$solarflux $solarmu" $skyrad \
+        put.e $prpfile NONE "$Nmu $Nphi"  S "$solarflux $solarmu" $skyrad \
            L $sfcalb $wavelen $splitacc $solacc "$accel $maxiter" \
            $fluxfile 1 $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
            $Ntimes | /usr/bin/time shdomppt  >>& shdompplog.t
@@ -453,10 +453,10 @@ if ($ThermalStCuCloudCase) then
   set molabs = (0.0026 0.014 0.025 0.0015 0.0015 0.0015 0.0015 0.0015 0.0015 0.020)
   set raylcoef=0
 
-  put $Ncomp water_w10.7.mie $Nlay "$heights" "$temps" \
+  put.e $Ncomp ../data/mie/water_w10.7_mie.dat $Nlay "$heights" "$temps" \
         0 0  0 0  0 0   30.57 12.70   25.01 11.88  19.45 10.93 \
        13.90  9.77  8.34  8.24   2.78  5.72  0 0 \
-      "$molabs"  $raylcoef $prpfile | ppmieprp > /dev/null
+      "$molabs"  $raylcoef $prpfile | ppmieprp.e > /dev/null
   echo " "
 
 
@@ -471,7 +471,7 @@ if ($ThermalStCuCloudCase) then
   set Nmu=64
   set fluxref=stcu${wavelen}disref_flux.out
   set radref=stcu${wavelen}disref_rad.out
-  put $prpfile NONE $Nmu T $Tsfc $Tsky $sfcalb  "$waveno1 $waveno2" \
+  put.e $prpfile NONE $Nmu T $Tsfc $Tsky $sfcalb  "$waveno1 $waveno2" \
       $fluxref  $radref 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
      10 | /usr/bin/time disortsh${Nmu} >&! disreflog${wavelen}.t
   set CPUref=`tail -2 disreflog${wavelen}.t | awk '{if (NR==1) print $1/10;}'`
@@ -485,7 +485,7 @@ if ($ThermalStCuCloudCase) then
 
     set fluxfile=stcu${wavelen}dis_flux.out
     set radfile=stcu${wavelen}dis_rad.out
-    put $prpfile NONE $Nmu T $Tsfc $Tsky $sfcalb "$waveno1 $waveno2"  \
+    put.e $prpfile NONE $Nmu T $Tsfc $Tsky $sfcalb "$waveno1 $waveno2"  \
         $fluxfile  $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180"  \
         $Ntimes | /usr/bin/time disortsh${Nmu} >&! disortlog.t
     set CPU=`tail -2 disortlog.t | awk '{if (NR==1) print $1+0;}'`
@@ -515,7 +515,7 @@ if ($ThermalStCuCloudCase) then
 
       set fluxfile=stcu${wavelen}shpp_flux.out
       set radfile=stcu${wavelen}shpp_rad.out
-      put $prpfile NONE "$Nmu $Nphi" T $Tsfc $Tsky  \
+      put.e $prpfile NONE "$Nmu $Nphi" T $Tsfc $Tsky  \
           L $sfcalb -1 "$waveno1 $waveno2" $splitacc $solacc "$accel $maxiter" \
           $fluxfile 1 $radfile 1 $heights[1]  6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
          $Ntimes | /usr/bin/time shdomppt >>& shdompplog.t
@@ -542,8 +542,3 @@ if ($ThermalStCuCloudCase) then
   echo " "; echo " "; echo " "
   rm -f  fd.t rd.t ref.t exp.t disortlog.t  shdompplog.t
 endif
-
-
-
-
-

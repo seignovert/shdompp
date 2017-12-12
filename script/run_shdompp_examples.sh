@@ -1,10 +1,10 @@
 #!/bin/csh
 # Script with examples of running SHDOMPP.
 #
-# To run all sections requires ppmieprp, shdompp, disortsh, and put in
-# the current path and Mie table files dust_w0.55.mie and water_w10.7.mie
+# To run all sections requires ppmieprp.e, shdompp.e, disortsh.e, and put.e in
+# the current path and Mie table files dust_w0.55_mie.dat and water_w10.7_mie.dat
 # in the current directory.  The BRDF test also requires shdom.  The
-# k-distribution test requires swrrtm_mls.ckd and swrrtm_liq_8.mie.
+# k-distribution test requires swrrtm_mls.ckd and swrrtm_liq_8_mie.dat.
 
 
 set SolarHGcloudTest=0
@@ -46,18 +46,18 @@ if ($SolarHGcloudTest) then
   set accel=T  ;   set maxiter=100
   set outbase=test1shpp
 
-  put $prpfile NONE "$Nmu $Nphi" S "$solarflux $solarmu" $skyrad \
+  put.e $prpfile NONE "$Nmu $Nphi" S "$solarflux $solarmu" $skyrad \
       L $sfcalb $wavelen $splitacc $solacc "$accel $maxiter" \
       ${outbase}f.out 1  ${outbase}r.out 1 1.0 \
       6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
-     | shdompp
+     | shdompp.e
 
   # Run DISORTSH
   set outbase=test1dis
-  put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+  put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
       ${outbase}f.out  ${outbase}r.out 1 1.0 \
       6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
-     | disortsh
+     | disortsh.e
 endif
 
 
@@ -68,18 +68,18 @@ if ($SolarMieAerosolTest) then
 
   if (0) then
      # Make Mie table with cloudprp (from SHDOM distribution)
-    set miefile=dust_w0.55.mie
+    set miefile="../data/mie/dust_w0.55_mie.dat"
     set wavelen=0.55
     set index="(1.50,-0.002)"
     set alpha=0.70
     set Nretab=20 ;  set Sretab=0.1 ;  set Eretab=2.0
     set maxNleg=500
-    put O $miefile A "$index" "$wavelen $wavelen" L $alpha \
+    put.e O $miefile A "$index" "$wavelen $wavelen" L $alpha \
         "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
   endif
 
 
-  # Make the SHDOMPP property file using ppmieprp
+  # Make the SHDOMPP property file using ppmieprp.e
   set prpfile=test2.pp
   set Ncomp=1
   set Nlay=3
@@ -88,8 +88,8 @@ if ($SolarMieAerosolTest) then
   set molabs = (0 0 0)
   set raylcoef=0.00332
 
-  put $Ncomp dust_w0.55.mie $Nlay "$heights" "$temps" \
-       0 0  0.10 1.0  0.20 1.5  "$molabs"  $raylcoef $prpfile | ppmieprp
+  put.e $Ncomp ../data/mie/dust_w0.55_mie.dat $Nlay "$heights" "$temps" \
+       0 0  0.10 1.0  0.20 1.5  "$molabs"  $raylcoef $prpfile | ppmieprp.e
 
 
   # Set some parameters for the radiative transfer
@@ -104,19 +104,19 @@ if ($SolarMieAerosolTest) then
   set splitacc=0.001 ;  set solacc=1.0E-5
   set accel=T  ;   set maxiter=30
   set outbase=test2shpp
-  put $prpfile NONE "$Nmu $Nphi" S "$solarflux $solarmu" $skyrad \
+  put.e $prpfile NONE "$Nmu $Nphi" S "$solarflux $solarmu" $skyrad \
       L $sfcalb $wavelen $splitacc $solacc "$accel $maxiter" \
       ${outbase}f.out 1  ${outbase}r.out 1 $heights[1] \
       6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
-     | shdompp
+     | shdompp.e
 
 
   # Run DISORTSH
   set outbase=test2dis
-  put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
+  put.e $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
       ${outbase}f.out  ${outbase}r.out 1 $heights[1]  \
       6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
-     | disortsh
+     | disortsh.e
 endif
 
 
@@ -127,7 +127,7 @@ if ($ThermalCloudTest) then
  # Runs 10.7 micron thermal radiative transfer in an atmosphere with
  # water vapor and a three layer thin stratus cloud.
 
-  # Make the SHDOMPP property file using ppmieprp
+  # Make the SHDOMPP property file using ppmieprp.e
   set prpfile=test3.pp
   set Ncomp=1
   set Nlay=7
@@ -136,9 +136,9 @@ if ($ThermalCloudTest) then
   set molabs = (0.0026 0.014 0.030 0.0015 0.0015 0.0015 0.020)
   set raylcoef=0
 
-  put $Ncomp water_w10.7.mie $Nlay "$heights" "$temps" \
+  put.e $Ncomp ../data/mie/water_w10.7_mie.dat $Nlay "$heights" "$temps" \
         0 0  0 0  0 0  13.90 9.77  8.34 8.24   2.78 5.72  0 0 \
-      "$molabs"  $raylcoef $prpfile | ppmieprp > /dev/null
+      "$molabs"  $raylcoef $prpfile | ppmieprp.e > /dev/null
 
 
   # Set up for SHDOMPP and DISORTSH runs
@@ -151,18 +151,18 @@ if ($ThermalCloudTest) then
   set splitacc=0.001 ;  set solacc=1.0E-4
   set accel=T  ;   set maxiter=30
   set outbase=test3shpp
-  put $prpfile NONE "$Nmu $Nphi" T $Tsfc $Tsky  \
+  put.e $prpfile NONE "$Nmu $Nphi" T $Tsfc $Tsky  \
       L $sfcalb -1 "$waveno1 $waveno2" $splitacc $solacc "$accel $maxiter" \
       ${outbase}f.out 1   ${outbase}r.out 1 $heights[1] \
         6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000" 1 0 \
-    | shdompp
+    | shdompp.e
 
 
   # Run DISORTSH
   set outbase=test3dis
-  put $prpfile NONE $Nmu T $Tsfc $Tsky $sfcalb  "$waveno1 $waveno2" \
+  put.e $prpfile NONE $Nmu T $Tsfc $Tsky $sfcalb  "$waveno1 $waveno2" \
       ${outbase}f.out  ${outbase}r.out 1 $heights[1] \
-      6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000" 1 0  | disortsh
+      6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000" 1 0  | disortsh.e
 endif
 
 
@@ -174,15 +174,15 @@ if ($BRDFtest) then
   #   The agreement is limited by a potential SHDOM bug for integrating
   #   the downwelling radiance at the surface for the BRDF calculation.
 
-  # Make a single layer SHDOMPP property file using ppmieprp
+  # Make a single layer SHDOMPP property file using ppmieprp.e
   set prpfile=test4.pp
   set Ncomp=1  ;   set Nlay=1
   set heights=(2.0 0.0)
   set temps = (275 288)
   set molabs = (0)
   set raylcoef=0.00332
-  put $Ncomp dust_w0.55.mie $Nlay "$heights" "$temps" \
-      0.1 1.0  "$molabs"  $raylcoef $prpfile | ppmieprp
+  put.e $Ncomp ../data/mie/dust_w0.55_mie.dat $Nlay "$heights" "$temps" \
+      0.1 1.0  "$molabs"  $raylcoef $prpfile | ppmieprp.e
 
 
   # Set some parameters for the radiative transfer
@@ -198,11 +198,11 @@ if ($BRDFtest) then
   set splitacc=0.001 ;  set solacc=1.0E-5
   set accel=T  ;   set maxiter=30
   set outbase=test4shpp
-  put $prpfile NONE "$Nmu $Nphi" S "$solarflux $solarmu" $skyrad \
+  put.e $prpfile NONE "$Nmu $Nphi" S "$solarflux $solarmu" $skyrad \
       R "$rho0 $k $Theta" $wavelen $splitacc $solacc "$accel $maxiter" \
       /dev/null 1  ${outbase}r.out 1 $heights[1] \
       6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
-     | shdompp
+     | shdompp.e
 
 
   # Translate SHDOMPP property file to SHDOM property file (for single layer)
@@ -221,13 +221,13 @@ if ($BRDFtest) then
 
   # Make the SHDOM surface file:
   set sfcfile=test4.sfc
-  put R "1 1 2.0 2.0" "1 1 290 $rho0 $k $Theta" >! $sfcfile
+  put.e R "1 1 2.0 2.0" "1 1 290 $rho0 $k $Theta" >! $sfcfile
 
   set outbase=test4shdom
   set sfcalb=0.1
   set splitacc=0.0001
   set deltaM=T
-  put $shdomprpfile $sfcfile NONE NONE NONE "1 1 3" "$Nmu $Nphi" 0 0 $deltaM E \
+  put.e $shdomprpfile $sfcfile NONE NONE NONE "1 1 3" "$Nmu $Nphi" 0 0 $deltaM E \
       S "$solarflux $solarmu 0" $skyrad $sfcalb \
       "$splitacc 0.0" "$accel $solacc $maxiter" \
       1 R "1 0 0 0 0 30 \
@@ -258,8 +258,8 @@ if ($RunKdistTest) then
 
   #    Set up the atmospheric profile and the CKD file names
   set atmfile=mls.atm
-  set ckdfile=swrrtm_mls.ckd
-  set miebase="swrrtm_liq_"
+  set ckdfile="../data/ckd/swrrtm_mls_ckd.dat"
+  set miebase="../data/mie/swrrtm_liq_"
 
   #  Cloudprp stuff:
   #   Set the starting and ending bands of the shortwave RRTM k-distribution
@@ -294,7 +294,7 @@ if ($RunKdistTest) then
   if (0) then
     set ib=$Eband
     while ($ib >= $Sband)
-      put O ${miebase}${ib}.mie $specavgflag $delwave[$ib] $plancktemp \
+      put.e O ${miebase}${ib}_mie.dat $specavgflag $delwave[$ib] $plancktemp \
           $cldphase  "$wavelen1[$ib] $wavelen2[$ib]" $clddisttype \
           $alpha "$Nretab $Sretab $Eretab" $maxNleg | cloudprp
       @ ib--
@@ -306,7 +306,7 @@ if ($RunKdistTest) then
   #    Make the correlated k-distribution data file
   if (0) then
     # 360, 1.7 and 0.3 are the ppmv of CO2, CH4, and N2O
-    put $atmfile $ckdfile 1.0 "360 1.7 0.3" | ~/kdist/rrtm/ckdswrrtm
+    put.e $atmfile $ckdfile 1.0 "360 1.7 0.3" | ~/kdist/rrtm/ckdswrrtm
   endif
 
 
@@ -323,8 +323,8 @@ if ($RunKdistTest) then
                    13.90 9.77  8.34 8.24  2.78 5.72   0 0)
     set molabs = (0 0 0 0 0 0 0 0 0)
 
-    put 1 ${miebase}${ib}.mie  $Nlay "$heights" "$temps" $LWPreff \
-        "$molabs"  $molecoef[$ib] $prpfile | ppmieprp > /dev/null
+    put.e 1 ${miebase}${ib}_mie.dat  $Nlay "$heights" "$temps" $LWPreff \
+        "$molabs"  $molecoef[$ib] $prpfile | ppmieprp.e > /dev/null
 
 
     # Run SHDOMPP
@@ -337,16 +337,16 @@ if ($RunKdistTest) then
     set accel=T  ;   set maxiter=100
 
     set outbase=kdist_shpp
-    put $prpfile $ckdfile "$Nmu $Nphi" S "$solarconstfac $solarmu" $skyrad \
+    put.e $prpfile $ckdfile "$Nmu $Nphi" S "$solarconstfac $solarmu" $skyrad \
         L $sfcalb -1 "$waveno1[$ib] $waveno2[$ib]" $splitacc $solacc "$accel $maxiter" \
         ${outbase}${ib}f.out 1   /dev/null 0 $heights[1]  1 1.0  1 0  \
-      | /usr/bin/time shdompp
+      | /usr/bin/time shdompp.e
 
     set outbase=kdist_dis
-    put $prpfile $ckdfile $Nmu S "$solarconstfac $solarmu" $skyrad \
+    put.e $prpfile $ckdfile $Nmu S "$solarconstfac $solarmu" $skyrad \
         $sfcalb "$waveno1[$ib] $waveno2[$ib]" \
         ${outbase}${ib}f.out  /dev/null 0 $heights[1]  1 1.0  1 0  \
-      | /usr/bin/time disortsh
+      | /usr/bin/time disortsh.e
 
     @ ib++
   end
