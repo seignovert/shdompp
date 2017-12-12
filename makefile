@@ -1,21 +1,31 @@
 # Makefile for SHDOMPP in distribution
+BIN = bin
+SRC = src
+OBJ = shdompp  \
+      disortsh \
+		  ppmieprp \
+			put
 
-#FFLAGS= -64 -ansi -O2
-FFLAGS= -fast
-FC= pgf90
+FFLAGS= -O2
+FC= gfortran
+GCC=gcc
 
+# Main
+main: $(OBJ)
 
-all: shdompp disortsh ppmieprp
+shdompp: $(SRC)/shdompp.f90 $(SRC)/fftpack.o
+	$(FC) $(FFLAGS) $(SRC)/shdompp.f90 $(SRC)/fftpack.o -o $(BIN)/shdompp.e
 
-shdompp: shdompp.f90 fftpack.o
-	$(FC) $(FFLAGS) shdompp.f90 fftpack.o -o shdompp
+disortsh: $(SRC)/disortsh.f90 $(SRC)/disort2.o
+	$(FC) $(FFLAGS) $(SRC)/disortsh.f90 $(SRC)/disort2.o  -o $(BIN)/disortsh.e
 
-disortsh: disortsh.f90 disort2.o
-	$(FC) $(FFLAGS) disortsh.f90 disort2.o  -o disortsh
+ppmieprp: $(SRC)/ppmieprp.f90
+	$(FC) $(FFLAGS) $(SRC)/ppmieprp.f90 -o $(BIN)/ppmieprp.e
 
-ppmieprp: ppmieprp.f90 
-	$(FC) $(FFLAGS) ppmieprp.f90 -o ppmieprp
+.f.o :; $(FC) $(FFLAGS) -o $@ -c $<
 
+put: $(SRC)/put.c
+	$(GCC) $(FFLAGS) $(SRC)/put.c -o $(BIN)/put.e
 
-.f.o :; $(FC) -c $(FFLAGS) $*.f
-
+clean:
+	$(RM) $(SRC)/*.o
