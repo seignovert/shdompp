@@ -15,7 +15,7 @@ set RunKdistTest=1
 
 
 if ($SolarHGcloudTest) then
- # Runs solar radiative transfer in a single layer cloud with a 
+ # Runs solar radiative transfer in a single layer cloud with a
  #   Henyey-Greenstein phase function
 
   # First make a single layer SHDOMPP property file with a H-G phase function
@@ -52,7 +52,7 @@ if ($SolarHGcloudTest) then
       6 "0.2588 0.5000 0.7071 0.8660 0.9659 1.000"  5 "0 45 90 135 180" \
      | shdompp
 
-  # Run DISORTSH 
+  # Run DISORTSH
   set outbase=test1dis
   put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
       ${outbase}f.out  ${outbase}r.out 1 1.0 \
@@ -87,9 +87,9 @@ if ($SolarMieAerosolTest) then
   set temps = (217  262 275 288)
   set molabs = (0 0 0)
   set raylcoef=0.00332
-  
+
   put $Ncomp dust_w0.55.mie $Nlay "$heights" "$temps" \
-       0 0  0.10 1.0  0.20 1.5  "$molabs"  $raylcoef $prpfile | ppmieprp 
+       0 0  0.10 1.0  0.20 1.5  "$molabs"  $raylcoef $prpfile | ppmieprp
 
 
   # Set some parameters for the radiative transfer
@@ -111,7 +111,7 @@ if ($SolarMieAerosolTest) then
      | shdompp
 
 
-  # Run DISORTSH 
+  # Run DISORTSH
   set outbase=test2dis
   put $prpfile NONE $Nmu S "$solarflux $solarmu" $skyrad $sfcalb  \
       ${outbase}f.out  ${outbase}r.out 1 $heights[1]  \
@@ -131,7 +131,7 @@ if ($ThermalCloudTest) then
   set prpfile=test3.pp
   set Ncomp=1
   set Nlay=7
-  set heights=(6.0 4.0 2.0 0.65  0.60  0.55  0.50  0.0)   
+  set heights=(6.0 4.0 2.0 0.65  0.60  0.55  0.50  0.0)
   set temps = (249 262 275 284.0 284.3 284.6 284.9 288.1)
   set molabs = (0.0026 0.014 0.030 0.0015 0.0015 0.0015 0.020)
   set raylcoef=0
@@ -158,7 +158,7 @@ if ($ThermalCloudTest) then
     | shdompp
 
 
-  # Run DISORTSH 
+  # Run DISORTSH
   set outbase=test3dis
   put $prpfile NONE $Nmu T $Tsfc $Tsky $sfcalb  "$waveno1 $waveno2" \
       ${outbase}f.out  ${outbase}r.out 1 $heights[1] \
@@ -182,7 +182,7 @@ if ($BRDFtest) then
   set molabs = (0)
   set raylcoef=0.00332
   put $Ncomp dust_w0.55.mie $Nlay "$heights" "$temps" \
-      0.1 1.0  "$molabs"  $raylcoef $prpfile | ppmieprp 
+      0.1 1.0  "$molabs"  $raylcoef $prpfile | ppmieprp
 
 
   # Set some parameters for the radiative transfer
@@ -306,7 +306,7 @@ if ($RunKdistTest) then
   #    Make the correlated k-distribution data file
   if (0) then
     # 360, 1.7 and 0.3 are the ppmv of CO2, CH4, and N2O
-    put $atmfile $ckdfile 1.0 "360 1.7 0.3" | ~/kdist/rrtm/ckdswrrtm 
+    put $atmfile $ckdfile 1.0 "360 1.7 0.3" | ~/kdist/rrtm/ckdswrrtm
   endif
 
 
