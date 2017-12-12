@@ -1,0 +1,249 @@
+See the script "run_compare_shdompp" for more information about the five
+test cases.
+
+Cases:
+  Solar:  mu0=0.50
+    0.55 um, tau=1.13, dust aerosols, Rayleigh scattering, ozone absorption
+    0.86 um, tau=14.7, LWP=100 marine BL cloud, sea salt below, Rayleigh
+    2.13 um, tau=15.5, LWP=100 marine BL cloud (6 layer), sea salt below
+    0.86 um, tau=95, thick uniform single cloud layer
+  Thermal:
+    10.7 um, tau=13.2, LWP=100 marine BL cloud, water vapor absorption
+
+For each case DISORTSH is run for Nmu=128 (or Nmu=64 for thermal
+emission) to serve as the reference or truth.  Then DISORTSH is run for
+a range of number of streams (e.g. Nmu=4, 8, 16, 32).  SHDOMPP is run
+for the same range of number of streams but also for several values of
+the adaptive layer splitting accuracy and solution accuracy parameters.
+The upwelling and downwelling fluxes at the layer boundaries and the top
+of atmosphere radiances in 26 unique directions are compared to the
+reference.  The accuracies listed are rms fractional differences, except
+for the solar fluxes which are absolute differences (for unity incident
+flux on the horizontal).   Accurate timings (seconds on a 1130 MHz
+Pentium III Dell Inspiron with a Portland Group Fortran 90 compiler) are
+made with special versions of SHDOMPP and DISORTSH that have loops to
+run the solver subroutines many times.
+
+
+
+DISORT array size: MXCMU=128
+
+DISORT accuracy for solar reflectance from dust atmos  wavelength=0.55  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif
+   4  0.117   0.0036   0.0164
+   8  0.232   0.0002   0.0024
+  16  0.483   0.0000   0.0005
+  32  1.190   0.0000   0.0001
+Note: The CPU seconds are much larger than for the small DISORT array
+sizes below.
+
+
+All the rest have DISORT array size: MXCMU=Nmu
+ 
+ 
+DISORT Nmu=128 reference CPU time: 25.23
+ 
+DISORT accuracy for solar reflectance from dust atmos  wavelength=0.55  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif
+   4  0.003   0.0036   0.0164
+   8  0.008   0.0002   0.0024
+  16  0.037   0.0000   0.0005
+  32  0.323   0.0000   0.0001
+ 
+SHDOMPP accuracy for solar reflectance from dust atmos  wavelength=0.55  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.001  solacc=1.0E-5
+   4  0.006   0.0036   0.0165     9   21
+   8  0.015   0.0002   0.0023    11   25
+  16  0.054   0.0000   0.0005    14   27
+  32  0.255   0.0000   0.0002    14   30
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0  solacc=1.0E-5
+   4  0.006   0.0036   0.0165     9   21
+   8  0.012   0.0002   0.0023    10   21
+  16  0.035   0.0002   0.0009    11   21
+  32  0.158   0.0002   0.0008    11   21
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.001  solacc=1.0E-4
+   4  0.005   0.0036   0.0165     7   21
+   8  0.013   0.0002   0.0023     9   25
+  16  0.044   0.0001   0.0005    11   27
+  32  0.197   0.0001   0.0003    11   30
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0  solacc=1.0E-4
+   4  0.005   0.0036   0.0165     7   21
+   8  0.011   0.0003   0.0023     8   21
+  16  0.030   0.0002   0.0009     9   21
+  32  0.139   0.0003   0.0010     9   21
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.001  solacc=1.0E-3
+   4  0.005   0.0034   0.0167     5   21
+   8  0.011   0.0004   0.0023     7   25
+  16  0.028   0.0009   0.0014     7   23
+  32  0.113   0.0005   0.0017     7   21
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0  solacc=1.0E-3
+   4  0.005   0.0034   0.0167     5   21
+   8  0.009   0.0006   0.0023     6   21
+  16  0.025   0.0004   0.0015     7   21
+  32  0.111   0.0005   0.0017     7   21
+ 
+ 
+ 
+ 
+ 
+DISORT Nmu=128 reference CPU time: 69.82
+ 
+DISORT accuracy for solar reflectance from stcu cloud  wavelength=0.86  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif
+   4  0.004   0.0029   0.0343
+   8  0.011   0.0001   0.0132
+  16  0.053   0.0000   0.0088
+  32  0.453   0.0000   0.0055
+ 
+SHDOMPP accuracy for solar reflectance from stcu cloud  wavelength=0.86  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-5
+   4  0.023   0.0027   0.0343    28   34
+   8  0.053   0.0002   0.0133    34   37
+  16  0.171   0.0001   0.0088    33   39
+  32  0.859   0.0004   0.0054    34   40
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-5
+   4  0.021   0.0027   0.0344    26   29
+   8  0.049   0.0004   0.0134    35   32
+  16  0.136   0.0002   0.0089    30   31
+  32  0.847   0.0002   0.0055    37   34
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.03  solacc=1.0E-5
+   4  0.021   0.0048   0.0375    29   26
+   8  0.040   0.0105   0.0394    33   26
+  16  0.149   0.0045   0.0180    38   27
+  32  0.781   0.0005   0.0059    40   29
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-4
+   4  0.019   0.0029   0.0345    19   34
+   8  0.042   0.0006   0.0135    25   37
+  16  0.117   0.0010   0.0088    22   39
+  32  0.599   0.0009   0.0055    24   40
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-4
+   4  0.018   0.0028   0.0345    19   29
+   8  0.039   0.0009   0.0136    26   32
+  16  0.107   0.0002   0.0089    23   31
+  32  0.577   0.0010   0.0056    25   34
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.03  solacc=1.0E-4
+   4  0.017   0.0051   0.0378    20   26
+   8  0.032   0.0111   0.0402    24   26
+  16  0.113   0.0050   0.0186    28   27
+  32  0.554   0.0014   0.0062    27   29
+ 
+DISORT Nmu=128 reference CPU time: 70.26
+ 
+DISORT accuracy for solar reflectance from stcu cloud  wavelength=2.13  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif
+   4  0.003   0.0019   0.0443
+   8  0.009   0.0001   0.0144
+  16  0.050   0.0000   0.0080
+  32  0.458   0.0000   0.0041
+ 
+SHDOMPP accuracy for solar reflectance from stcu cloud  wavelength=2.13  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-5
+   4  0.015   0.0019   0.0441    21   34
+   8  0.035   0.0001   0.0144    22   40
+  16  0.140   0.0002   0.0080    25   43
+  32  0.735   0.0003   0.0041    26   45
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-5
+   4  0.015   0.0018   0.0439    21   31
+   8  0.033   0.0002   0.0145    25   32
+  16  0.136   0.0002   0.0079    29   33
+  32  0.700   0.0004   0.0044    29   36
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.03  solacc=1.0E-5
+   4  0.013   0.0031   0.0481    19   26
+   8  0.028   0.0004   0.0145    22   29
+  16  0.120   0.0007   0.0089    28   30
+  32  0.644   0.0013   0.0088    29   32
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-4
+   4  0.012   0.0018   0.0442    15   34
+   8  0.030   0.0001   0.0144    18   40
+  16  0.104   0.0005   0.0080    18   43
+  32  0.471   0.0011   0.0052    17   45
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-4
+   4  0.012   0.0018   0.0440    16   31
+   8  0.024   0.0004   0.0143    17   32
+  16  0.088   0.0008   0.0080    18   33
+  32  0.416   0.0011   0.0054    17   36
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.03  solacc=1.0E-4
+   4  0.010   0.0032   0.0483    13   26
+   8  0.023   0.0005   0.0144    17   29
+  16  0.081   0.0010   0.0091    18   30
+  32  0.385   0.0018   0.0100    17   32
+ 
+ 
+ 
+
+ 
+DISORT Nmu=128 reference CPU time: 13.58
+ 
+DISORT accuracy for solar reflectance from thick cloud  wavelength=0.86  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif
+   4 0.0013   0.0002   0.0261
+   8 0.0022   0.0000   0.0104
+  16 0.0080   0.0000   0.0067
+ 
+SHDOMPP accuracy for solar reflectance from thick cloud wavelength=0.86  mu0=0.5
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-5
+   4  0.046   0.0005   0.0262    53   53
+   8  0.167   0.0005   0.0105    56   66
+  16  0.650   0.0004   0.0068    54   72
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-5
+   4  0.047   0.0004   0.0262    59   47
+   8  0.181   0.0006   0.0104    64   61
+  16  0.813   0.0004   0.0067    73   66
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.03  solacc=1.0E-5
+   4  0.092   0.0145   0.0418   144   42
+   8  0.248   0.0034   0.0125   102   54
+  16  1.078   0.0030   0.0094   108   60
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-4
+   4  0.022   0.0004   0.0262    19   53
+   8  0.068   0.0008   0.0102    19   66
+  16  0.272   0.0010   0.0067    21   72
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-4
+   4  0.019   0.0006   0.0263    17   47
+   8  0.066   0.0011   0.0102    20   61
+  16  0.254   0.0011   0.0067    21   66
+ Nmu   CPU rmsFluxDif rmsRadFdif iters Npts   splitacc=0.03  solacc=1.0E-4
+   4  0.020   0.0128   0.0394    21   42
+   8  0.065   0.0037   0.0127    21   54
+  16  0.257   0.0035   0.0099    23   60
+ 
+ 
+ 
+ 
+ 
+ 
+Reference CPU time: 0.114
+DISORT accuracy for thermal emission from stcu cloud  wavelength=10.7
+ Nmu   CPU rmsFluxFdif rmsRadFdif
+   4 0.0006   0.0073   0.0033
+   8 0.0014   0.0030   0.0006
+  16 0.0044   0.0007   0.0001
+ 
+SHDOMPP accuracy for thermal emission from stcu cloud  wavelength=10.7
+ Nmu   CPU rmsFluxFdif rmsRadFdif iters Npts   splitacc=0.001  solacc=1.0E-5
+   4 0.0042   0.0065   0.0036     7   38
+   8 0.0081   0.0021   0.0009     9   40
+  16 0.0157   0.0007   0.0003    10   40
+ Nmu   CPU rmsFluxFdif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-5
+   4 0.0038   0.0065   0.0040     8   33
+   8 0.0070   0.0021   0.0013     9   35
+  16 0.0146   0.0008   0.0003    10   36
+ Nmu   CPU rmsFluxFdif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-5
+   4 0.0025   0.0072   0.0112     5   30
+   8 0.0043   0.0036   0.0101     7   30
+  16 0.0076   0.0017   0.0052     7   31
+ Nmu   CPU rmsFluxFdif rmsRadFdif iters Npts   splitacc=0.001  solacc=1.0E-4
+   4 0.0039   0.0065   0.0036     6   38
+   8 0.0071   0.0021   0.0009     7   40
+  16 0.0136   0.0007   0.0003     8   40
+ Nmu   CPU rmsFluxFdif rmsRadFdif iters Npts   splitacc=0.003  solacc=1.0E-4
+   4 0.0033   0.0065   0.0040     6   33
+   8 0.0061   0.0021   0.0012     7   35
+  16 0.0127   0.0008   0.0003     8   36
+ Nmu   CPU rmsFluxFdif rmsRadFdif iters Npts   splitacc=0.01  solacc=1.0E-4
+   4 0.0020   0.0073   0.0112     3   30
+   8 0.0035   0.0036   0.0102     5   30
+  16 0.0060   0.0017   0.0053     5   31
+ 
+ 
+ 
+ 
