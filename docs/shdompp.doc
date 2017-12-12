@@ -1,0 +1,298 @@
+ 
+
+      SHDOMPP - Spherical Harmonic Discrete Ordinate Method
+                for Plane-Parallel Atmospheric Radiative Transfer
+
+
+
+                        OVERVIEW
+
+SHDOMPP computes unpolarized radiative transfer in a plane-parallel
+medium for either collimated solar and/or thermal emission sources of
+radiation.   Currently Lambertian and RPV land surface BRDF surface
+reflection are supported.  The atmosphere optical properties are
+specified with an input file listing the layer interface heights and
+temperatures, and layer optical depth, single scattering albedo, and
+Legendre series coefficients of the phase function.  Two output files
+are generated: one with the upwelling and downwelling hemispheric fluxes
+and actinic fluxes at the layer boundaries and another with radiances at
+specified heights and directions.  The SHDOMPP calculation may be either
+monochromatic or spectrally integrated with a k-distribution.
+
+The SOLVE_SHDOMPP subroutine in shdompp.f90 is designed to be simple to
+call in user programs, and its inputs and outputs are documented in the
+code.  SHDOMPP is written in Fortran 90.
+
+
+
+            SIMILARITIES AND DIFFERENCES FROM SHDOM
+
+The algorithm is based on that of SHDOM, having iterations between
+calculating the source function in spherical harmonics and integrating
+the radiative transfer equation in discrete ordinates.  A major
+difference from SHDOM is that the medium is represented by layers which
+have uniform optical properties, like DISORT, rather than linear
+interpolation of the optical properties between grid points.  Another
+difference from SHDOM is that the source function is interpolated within
+each layer by a cubic polynomial (quadratic at the layer boundaries). 
+This gives higher accuracy in the source function integration, allowing
+fewer points (levels) to be used for the same accuracy.  Like SHDOM, an
+adaptive grid is used, but the criterion for deciding to split sublayers
+is different.  The current SHDOMPP cell splitting criterion is the rms
+radiance difference between using the cubic/quadratic and linear source
+function interpolation in the RTE integration.  Thus it is a measure of
+how much the curvature of the source function affects the radiances. The
+splitting criterion is normalized, so it is a relative measure, whereas
+the criterion in SHDOM is an absolute measure.   Unlike in SHDOM the
+spherical harmonic series of the source function is not adaptive.  The
+delta-M method is always turned on internally, and is not a user
+specified parameter.  SHDOMPP is written completely in Fortran 90 and
+exists in one file, while SHDOM is mainly Fortran 77.
+
+
+                     INPUT PARAMETERS
+
+The parameters are input in the routine USER_INPUT.  USER_INPUT uses
+READ statements from stdin in response to written messages.  The
+USER_INPUT routine echos the input values so that a useful "log" file
+output is produced when run non-interactively (see scripts).
+
+ Parameter      Description
+ PROPFILE       name of the input medium property file
+ CKDFILE        name of the input correlated k-distribution file (or NONE)
+                  The CKD file has the same format as for SHDOM.
+ NMU, NPHI      number of discrete ordinates covering -1<mu<1 and 0<phi<2pi
+ SRCTYPE        S' for solar source, 'T' for thermal source, 'B' for both
+
+         Following for Solar or Both source
+ SOLARFLUX      top of medium solar flux on a horizontal surface (any units)
+ SOLARMU        cosine of the solar zenith angle (this represents the
+                direction of travel of the solar beam, so is forced
+                to be negative although it can be specified positive).
+ SKYRAD         isotropic diffuse radiance incident from above
+
+         Following for Thermal or Both source
+ SFCTEMP        temperature of surface (Kelvin)
+
+         Following for Thermal source
+ SKYRAD         blackbody temperature (Kelvin) of radiation incident from above
+ 
+ SFCTYPE        type of surface: L for Lambertian, R for RPV BRDF
+ SFCPARMS(*)    array of surface parameters: 
+                  SFCPARM(1) is albedo for SFCTYPE='L',
+                  SFCPARM(1:3) are rho0, k, Theta for RPV.
+                (Rahman, Pinty, Verstraete, 1993: J. Geophys. Res., 98, 20791)
+
+ WAVELEN        wavelength in microns (if <=0 then wavenumbers used instead)
+ WAVENO(1:2)    wavenumber range (cm^-1) (WAVENO(1)<WAVENO(2))
+
+ SPLITACC       cell splitting accuracy; sublayers that have the adaptive
+                  splitting criterion above this value are split.  
+                  It is relative to the typical radiance level.
+                  Set to zero or negative for no adaptive cell splitting.
+ SOLACC         solution accuracy - tolerance for solution criterion
+                  The solution criterion is the rms change in the source
+                  function in one iteration, so the true solution accuracy
+                  is considerably larger when convergence is slow.
+ ACCELFLAG      T (true) to do the sequence acceleration. An acceleration
+                  extrapolation of the source function is done every other
+                  iteration.
+ MAXITER        maximum number of iterations allowed
+
+ FLUXFILE       name of output file for fluxes
+ FLUXPARM       1 for output at the input layer boundaries, 2 for output at
+                  the adaptive sublayer boundaries (except for k-distribution)
+ RADFILE        name of output file for radiances.  The radiances are output
+                  at NMUOUT*NPHIOUT directions for each of NZOUT heights.
+ NZOUT          number of height levels for output radiance
+ ZOUT           array of height levels for output radiance
+ NMUOUT         number of cosine zenith angles for output radiance
+ MUOUT          array of cosine zenith angles for output radiance
+ NPHIOUT        number of azimuth angles for output radiance
+ PHIOUT         array of azimuth angles for output radiance (degrees)
+
+
+There are also three parameters set in the code at the top of shdompp.f90:
+ MAXDELTAU=1.0         maximum layer optical depth allowed in initial sublayers
+ SPLITTING_FACTOR=10.0 max number of internal grid points is this factor
+                         times the number of input layers + optical depth
+              (We have to guess the maximum array size for the adaptive grid.)
+ PRNT=.TRUE.           true for interation printing, false for no printing
+
+There is a parameter set at the top of the SOLVE_SHDOMPP subroutine:
+  MINDELTAUSPLIT=1.0E-3  minimum scaled optical depth for which an input
+                           layer is divided into two sublayers or 
+                           adaptively split
+
+
+
+                       PROPERTY FILE FORMAT
+
+The medium optical properties are specified for uniform layers from the
+top of the atmosphere down to the surface.  The file is plain ascii and
+read by Fortran free format (so most "lines" may be broken across
+lines).  The property file has a header of two lines followed by one
+line for each layer:
+      Nlay
+      Ztoa  Ttoa
+      Zbot  Tbot  tau  ssalb  Nleg  Chi1 Chi2 ...
+        . . .
+ "Nlay" is the number of layers.  "Ztoa" is the height and "Ttoa" is the
+temperature (K) of the top boundary of the first layer.  "Zbot" is the
+height and "Tbot" is the temperature (K) of the bottom boundary of the 
+layer.  "tau" is the layer optical thickness (not the cumulative optical
+depth), and "ssalb" is the single scattering albedo of the layer. 
+"Nleg" is the order of the Legendre series for the phase function, i.e.
+it is the number of Legendre coefficients that follow.  "Chi?" are the
+Legendre series phase function coefficients, starting with l=1 (so that
+Chi1 is 3 times the asymmetry parameter).  The heights must decrease,
+but can have any units, except they must match the k-distribution file
+(usually units of km) when input.
+
+For solar reflection problems the whole Legendre phase function series
+is used to calculate output radiances using the Nakajima and Tanaka
+(1988) TMS method.  Therefore, the full Legendre series (until ChiN<<1)
+should be input.
+
+
+                  USING A K-DISTRIBUTION
+
+Spectral integration across a wavenumber band may be performed using a
+k-distribution.  If the CKDFILE input is NONE then a monochromatic
+calculation is performed, otherwise the CKDFILE contains the molecular
+absorption coefficients of the k-distribution for a particular 
+atmospheric profile.  The format of the CKD file is the same as that for
+SHDOM.  SHDOMPP loops over the k-distribution calling the monochromatic
+solver (SOLVE_SHDOMPP) once for each k.  For each k the molecular
+absorption profile is integrated over each layer in the input property
+file (assuming linear interpolation between the levels in the CKD file),
+and added to the optical properties specified in the property file.
+
+
+                      ACCURACY ISSUES
+
+The accuracy of SHDOMPP output radiances and fluxes is determined by the
+angular resolution, chosen by NMU and NPHI, the spatial resolution,
+chosen by SPLITACC (and the input property file and the MAXDELTAU
+parameter), and the solution convergence, chosen by SOLACC.  By contrast
+the accuracy of DISORT is determined solely by the number of streams
+(NMU).  A good choice for solar reflection problems is NPHI=2*NMU, but
+for high Sun or low viewing zenith angles or a more isotropic phase
+function a smaller NPHI could be accurate.  For thermal emission
+problems set NPHI=1.  Note: NPHI is the number of azimuth angles in 0 to
+2*pi, but only the range 0 to pi is actually used internally.   There is
+seldom any point in having the SPLITACC and SOLACC parameters set very
+small if the accuracy is limited by low angular resolution (small NMU). 
+How the actual accuracy depends on the input parameters should be
+investigated with a convergence test for problems similiar to the ones
+you want to carry out.  See the "run_compare_shdompp" script for
+examples of convergence testing.  See "compare_shdompp_disort.txt" for
+the accuracy and timing results comparing SHDOMPP and DISORT for a
+variety of atmospheric radiative transfer problems.  
+
+
+
+                 RUNNING SHDOMPP
+
+First compile shdompp.f90, and the other programs in the distribution if
+desired.  Edit the makefile to specify your Fortran 90 compiler and
+flags.  The distribution contains two scripts to illustrate how to run
+SHDOMPP:
+  run_shdompp_examples   five radiative transfer examples, including a
+                            k-distribution test.
+  run_compare_shdompp    extensive accuracy and timing comparison of
+                            SHDOMPP and DISORTSH for monochromatic RT.
+
+
+
+
+              OTHER PROGRAMS in DISTRIBUTION
+
+
+DISORTSH
+
+disortsh.f90 is a driver program for DISORT version 2.1, which is
+available via anonymous ftp from 
+   ftp://climate.gsfc.nasa.gov/pub/wiscombe/Multiple_Scatt/DISORT2.0beta
+(note: the directory and file names tend to change).  The relevant
+Fortran files of the DISORT distribution are provided in the file
+"disort2.f".  Although disortsh is written in Fortran 90 and
+automatically allocates the appropriate array sizes, there are array
+sizes internal to DISORT that may need to be changed.  In disort2.f look
+for "LOCAL SYMBOLIC DIMENSIONS" and change MXCLY, MXULV, MXCMU, MXUMU,
+and MXPHI as needed.  Note: there is a dramatic increase in running time
+if these array sizes are much larger than needed for the particular
+problem.  See DISORT.doc for description of the DISORT routine and
+parameters.
+
+DISORTSH reads the same optical property files as SHDOMPP.  Its user
+inputs read from stdin are also similiar to those of SHDOMPP, and its
+output file format is also similiar.  Run disortsh interactively, or
+look at the scripts or the USER_INPUT subroutine to see the required
+input parmeters.
+
+
+
+PPMIEPRP
+
+ppmieprp.f90 makes optical properties files for SHDOMPP and DISORTSH
+using Mie table files output by cloudprp or make_mie_table (in the SHDOM 
+distribution). The integrated mass content (e.g. liquid water path) and 
+effective radius for each of several particle components are specified 
+for each layer.  Molecular Rayleigh scattering is included with a Rayleigh
+scattering coefficient [K/(km mb)] that depends on wavelength.  The
+pressure at the layer boundaries, from which the integrated air density
+is calculated, are computed by the program from the input height and
+temperature profile.  A molecular absorption for each layer is also
+specified; these must be computed with another program such as MODTRAN.
+
+Rayleigh scattering coefficient:  The molecular scattering coefficient
+depends on the air density.  Hence for a particular solar wavelength 
+band a coefficient (k) may be defined which gives the extinction from
+the air pressure (p) and temperature (T):  ext = k p/T.  The Rayleigh
+scattering coefficient input may be derived from the molecular Rayleigh
+scattering optical depth.  The Rayleigh optical depth at sea level as a
+function of wavelength (lambda in micron) is
+    tau = 0.0088*lambda**(-4.15+0.2*lambda)
+From this formula the cloudprp Rayleigh input coefficient is
+    k = (2.97E-4 K mb^-1 km^-1) lambda**(-4.15+0.2*lambda)
+
+ Parameter      Description
+ NCOMP        number of optical components (i.e. number of Mie table files)
+ MIEFILES(*)  names of the Mie table files made by cloudprp
+ NLAY         number of layers
+ HEIGHTS(*)   heights of layer boundaries from the top down (km)
+ TEMPS(*)     layer boundary temperatures from the top down (Kelvin)
+   For each layer:
+ LWP(*)       liquid water paths (g/m^2) of each component
+ REFF(*)      effective radius (micron) of each component
+
+ MOLABS(*)    molecular absorption optical depth for each layer
+ RAYLCOEF     molecular Rayleigh scattering coefficient (K/(km mb))
+ PROPFILE     name of output property file 
+
+
+
+  DISTRIBUTION FILES
+
+shdompp.f90              SHDOMPP code (all of it)
+fftpack.f                FFT routines
+shdompp.doc              this documentation file
+disortsh.f90             DISORT driver program with SHDOMPP like interface
+disort2.f                DISORT routines
+DISORT.doc               DISORT documentation file
+ppmieprp.f90             program to make SHDOMPP input property files
+makefile                 make file to compile distribution programs
+run_shdompp_examples     csh script of examples of running SHDOMPP/DISORTSH
+run_compare_shdompp      csh script to run SHDOMPP/DISORTSH comparison
+compare_shdompp_disort.txt   results of SHDOMPP/DISORTSH comparison
+put.c                    utility program for the scripts
+dust_w0.55.mie           dust aerosol Mie table for 0.55 um
+seasalt_w0.86.mie        sea salt aerosol Mie table for 0.86 um
+seasalt_w2.13.mie        sea salt aerosol Mie table for 2.13 um
+water_w0.86.mie          cloud droplet Mie table for 0.86 um
+water_w2.13.mie          cloud droplet Mie table for 2.13 um
+water_w10.7.mie          cloud droplet Mie table for 10.7 um
+swrrtm_mls.ckd           shortwave RRTM k-distribution file for MLS atmosphere
+swrrtm_liq_8.mie         SW RRTM band 8 cloud droplet Mie table
+
