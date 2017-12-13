@@ -29,7 +29,12 @@ put: $(SRC)/put.c
 
 .PHONY: test
 test:
-	cd tests ; ./run_shdompp_examples.sh
+	cd tests ; \
+	./test_SolarHGcloud.sh ; \
+	./test_SolarMieAerosol.sh ; \
+	./test_ThermalCloud.sh ; \
+	./test_BRDF.sh ; \
+	./test_Kdist.sh
 
 .PHONY: clean
 clean:
