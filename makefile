@@ -33,4 +33,4 @@ test:
 
 .PHONY: clean
 clean:
-	$(RM) $(SRC)/*.o
+	$(RM) $(SRC)/*.o tests/*.pp tests/*.out tests/*.prp tests/*.sfc
