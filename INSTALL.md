@@ -20,7 +20,11 @@ make
 ```
 
 ## Testing
+Testing scripts (with there input data) are available in the `tests` directory.
+
+All the tests can be run with:
 ```bash
-cd script
-./run_shdompp_examples
+make test
 ```
+
+_Note:_ For now `run_compare_shdompp.sh` does not work out of the box.

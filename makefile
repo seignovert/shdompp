@@ -27,5 +27,10 @@ ppmieprp: $(SRC)/ppmieprp.f90
 put: $(SRC)/put.c
 	$(GCC) $(FFLAGS) $(SRC)/put.c -o $(BIN)/put.e
 
+.PHONY: test
+test:
+	cd tests ; ./run_shdompp_examples.sh
+
+.PHONY: clean
 clean:
 	$(RM) $(SRC)/*.o

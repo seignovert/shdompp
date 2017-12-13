@@ -68,7 +68,7 @@ if ($SolarMieAerosolTest) then
 
   if (0) then
      # Make Mie table with cloudprp (from SHDOM distribution)
-    set miefile="../data/mie/dust_w0.55_mie.dat"
+    set miefile="data/mie/dust_w0.55_mie.dat"
     set wavelen=0.55
     set index="(1.50,-0.002)"
     set alpha=0.70
@@ -88,7 +88,7 @@ if ($SolarMieAerosolTest) then
   set molabs = (0 0 0)
   set raylcoef=0.00332
 
-  put.e $Ncomp ../data/mie/dust_w0.55_mie.dat $Nlay "$heights" "$temps" \
+  put.e $Ncomp data/mie/dust_w0.55_mie.dat $Nlay "$heights" "$temps" \
        0 0  0.10 1.0  0.20 1.5  "$molabs"  $raylcoef $prpfile | ppmieprp.e
 
 
@@ -136,7 +136,7 @@ if ($ThermalCloudTest) then
   set molabs = (0.0026 0.014 0.030 0.0015 0.0015 0.0015 0.020)
   set raylcoef=0
 
-  put.e $Ncomp ../data/mie/water_w10.7_mie.dat $Nlay "$heights" "$temps" \
+  put.e $Ncomp data/mie/water_w10.7_mie.dat $Nlay "$heights" "$temps" \
         0 0  0 0  0 0  13.90 9.77  8.34 8.24   2.78 5.72  0 0 \
       "$molabs"  $raylcoef $prpfile | ppmieprp.e > /dev/null
 
@@ -181,7 +181,7 @@ if ($BRDFtest) then
   set temps = (275 288)
   set molabs = (0)
   set raylcoef=0.00332
-  put.e $Ncomp ../data/mie/dust_w0.55_mie.dat $Nlay "$heights" "$temps" \
+  put.e $Ncomp data/mie/dust_w0.55_mie.dat $Nlay "$heights" "$temps" \
       0.1 1.0  "$molabs"  $raylcoef $prpfile | ppmieprp.e
 
 
@@ -254,12 +254,15 @@ endif
 
 
 if ($RunKdistTest) then
-  # Runs SHDOMPP in k-distribution mode using the shortwave RRTM k-distribution.
+  echo "========================================"
+  echo "Runs SHDOMPP in k-distribution mode"
+  echo "using the shortwave RRTM k-distribution."
+  echo "========================================"
 
   #    Set up the atmospheric profile and the CKD file names
   set atmfile=mls.atm
-  set ckdfile="../data/ckd/swrrtm_mls_ckd.dat"
-  set miebase="../data/mie/swrrtm_liq_"
+  set ckdfile="data/ckd/swrrtm_mls_ckd.dat"
+  set miebase="data/mie/swrrtm_liq_"
 
   #  Cloudprp stuff:
   #   Set the starting and ending bands of the shortwave RRTM k-distribution
