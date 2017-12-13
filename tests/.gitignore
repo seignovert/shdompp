@@ -1,3 +1,5 @@
 # Ignore outputs
 *.pp
 *.out
+*.prp
+*.sfc
